@@ -60,10 +60,19 @@ public class ForkingTestClassProcessor implements TestClassProcessor {
 
     @Override
     public void processTestClass(TestClassRunInfo testClass) {
-        if (remoteProcessor == null) {
-            remoteProcessor = forkProcess();
+        int i = 0;
+        RuntimeException exception = null;
+        while (remoteProcessor == null && i < 10) {
+            try {
+                remoteProcessor = forkProcess();
+                exception = null;
+                break;
+            } catch (RuntimeException e) {
+                exception = e;
+                i++;
+            }
         }
-
+        if (exception != null) throw exception;
         remoteProcessor.processTestClass(testClass);
     }
 

@@ -46,22 +46,29 @@ public class TcpOutgoingConnector implements OutgoingConnector {
         // Now try each address
         try {
             Exception lastFailure = null;
-            for (InetAddress candidate : candidateAddresses) {
-                LOGGER.debug("Trying to connect to address {}.", candidate);
-                SocketChannel socketChannel;
-                try {
-                    socketChannel = tryConnect(address, candidate);
-                } catch (SocketException e) {
-                    LOGGER.debug("Cannot connect to address {}, skipping.", candidate);
-                    lastFailure = e;
-                    continue;
-                } catch (SocketTimeoutException e) {
-                    LOGGER.debug("Timeout connecting to address {}, skipping.", candidate);
-                    lastFailure = e;
-                    continue;
+            long retryDelay = 500;
+            for (int i = 0; i<10; i++) {
+                if (i > 0) {
+                    Thread.sleep(retryDelay);
+                    retryDelay = retryDelay * 2;
                 }
-                LOGGER.debug("Connected to address {}.", socketChannel.socket().getRemoteSocketAddress());
-                return new SocketConnectCompletion(socketChannel);
+                for (InetAddress candidate : candidateAddresses) {
+                    LOGGER.debug("Trying to connect to address {}.", candidate);
+                    SocketChannel socketChannel;
+                    try {
+                        socketChannel = tryConnect(address, candidate);
+                    } catch (SocketException e) {
+                        LOGGER.debug("Cannot connect to address {}, skipping.", candidate);
+                        lastFailure = e;
+                        continue;
+                    } catch (SocketTimeoutException e) {
+                        LOGGER.debug("Timeout connecting to address {}, skipping.", candidate);
+                        lastFailure = e;
+                        continue;
+                    }
+                    LOGGER.debug("Connected to address {}.", socketChannel.socket().getRemoteSocketAddress());
+                    return new SocketConnectCompletion(socketChannel);
+                }
             }
             throw new org.gradle.internal.remote.internal.ConnectException(String.format("Could not connect to server %s. Tried addresses: %s.",
                     destinationAddress, candidateAddresses), lastFailure);
