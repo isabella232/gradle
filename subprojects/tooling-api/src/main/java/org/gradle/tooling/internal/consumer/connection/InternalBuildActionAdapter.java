@@ -20,6 +20,7 @@ import org.gradle.tooling.BuildAction;
 import org.gradle.tooling.internal.adapter.ProtocolToModelAdapter;
 import org.gradle.tooling.internal.consumer.converters.ConsumerTargetTypeProvider;
 import org.gradle.tooling.internal.consumer.versioning.ModelMapping;
+import org.gradle.tooling.internal.consumer.versioning.VersionDetails;
 import org.gradle.tooling.internal.protocol.InternalBuildAction;
 import org.gradle.tooling.internal.protocol.InternalBuildController;
 
@@ -33,13 +34,18 @@ import java.io.File;
 public class InternalBuildActionAdapter<T> implements InternalBuildAction<T> {
     private final BuildAction<T> action;
     private final File rootDir;
+    private final VersionDetails versionDetails;
 
-    public InternalBuildActionAdapter(BuildAction<T> action, File rootDir) {
+    public InternalBuildActionAdapter(BuildAction<T> action, File rootDir, VersionDetails versionDetails) {
         this.action = action;
         this.rootDir = rootDir;
+        this.versionDetails = versionDetails;
     }
 
     public T execute(final InternalBuildController buildController) {
-        return action.execute(new BuildControllerAdapter(new ProtocolToModelAdapter(new ConsumerTargetTypeProvider()), buildController, new ModelMapping(), rootDir));
+        ProtocolToModelAdapter protocolToModelAdapter = new ProtocolToModelAdapter(new ConsumerTargetTypeProvider());
+        BuildControllerAdapter buildControllerAdapter = new BuildControllerAdapter(protocolToModelAdapter, buildController, new ModelMapping(), rootDir);
+        BuildInvocationsAdapterController buildInvocationsCompatibilityAdapter = new BuildInvocationsAdapterController(protocolToModelAdapter, versionDetails, buildControllerAdapter);
+        return action.execute(buildInvocationsCompatibilityAdapter);
     }
 }

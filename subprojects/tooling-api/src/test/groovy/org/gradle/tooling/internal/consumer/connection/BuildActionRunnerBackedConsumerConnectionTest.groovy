@@ -54,10 +54,6 @@ class BuildActionRunnerBackedConsumerConnectionTest extends Specification {
         def details = connection.versionDetails
 
         expect:
-        !details.supportsTaskDisplayName()
-        !details.supportsCancellation()
-
-        and:
         details.maySupportModel(HierarchicalEclipseProject)
         details.maySupportModel(EclipseProject)
         details.maySupportModel(IdeaProject)

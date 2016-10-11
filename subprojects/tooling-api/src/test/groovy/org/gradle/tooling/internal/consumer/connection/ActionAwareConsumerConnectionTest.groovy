@@ -18,10 +18,19 @@ package org.gradle.tooling.internal.consumer.connection
 
 import org.gradle.tooling.BuildAction
 import org.gradle.tooling.BuildActionFailureException
+import org.gradle.tooling.BuildController
 import org.gradle.tooling.internal.adapter.ProtocolToModelAdapter
 import org.gradle.tooling.internal.consumer.parameters.ConsumerOperationParameters
 import org.gradle.tooling.internal.consumer.versioning.ModelMapping
-import org.gradle.tooling.internal.protocol.*
+import org.gradle.tooling.internal.protocol.BuildResult
+import org.gradle.tooling.internal.protocol.ConfigurableConnection
+import org.gradle.tooling.internal.protocol.ConnectionMetaDataVersion1
+import org.gradle.tooling.internal.protocol.ConnectionVersion4
+import org.gradle.tooling.internal.protocol.InternalBuildAction
+import org.gradle.tooling.internal.protocol.InternalBuildActionExecutor
+import org.gradle.tooling.internal.protocol.InternalBuildActionFailureException
+import org.gradle.tooling.internal.protocol.InternalBuildController
+import org.gradle.tooling.internal.protocol.ModelBuilder
 import org.gradle.tooling.model.GradleProject
 import org.gradle.tooling.model.build.BuildEnvironment
 import org.gradle.tooling.model.eclipse.EclipseProject
@@ -48,10 +57,6 @@ class ActionAwareConsumerConnectionTest extends Specification {
         def details = connection.versionDetails
 
         expect:
-        !details.supportsTaskDisplayName()
-        !details.supportsCancellation()
-
-        and:
         details.maySupportModel(HierarchicalEclipseProject)
         details.maySupportModel(EclipseProject)
         details.maySupportModel(IdeaProject)
@@ -74,9 +79,6 @@ class ActionAwareConsumerConnectionTest extends Specification {
         def details = connection.versionDetails
 
         expect:
-        details.supportsTaskDisplayName()
-
-        and:
         !details.supportsCancellation()
 
         and:
@@ -113,7 +115,7 @@ class ActionAwareConsumerConnectionTest extends Specification {
                 getModel() >> actionResult
             }
         }
-        1 * action.execute({ it instanceof BuildControllerAdapter }) >> 'result'
+        1 * action.execute({ it instanceof BuildController }) >> 'result'
     }
 
     def "adapts build action failure"() {
