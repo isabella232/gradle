@@ -27,7 +27,7 @@ class TasksFactoryTest extends Specification {
     @Rule
     public TestNameTestDirectoryProvider temporaryFolder = new TestNameTestDirectoryProvider()
     final Project project = Mock()
-    final def eclipseProject = new DefaultEclipseProject(null, null, null, null, [])
+    final def eclipseProject = new DefaultEclipseProject(projectIdentifier, null, null, null, [], null)
     final task = TestUtil.create(temporaryFolder).task(AbstractTask)
 
     def "does not return tasks"() {

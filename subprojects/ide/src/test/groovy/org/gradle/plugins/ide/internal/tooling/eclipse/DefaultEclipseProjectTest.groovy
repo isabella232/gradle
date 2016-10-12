@@ -19,21 +19,21 @@ import spock.lang.Specification
 
 class DefaultEclipseProjectTest extends Specification {
     def usesPathForToStringValue() {
-        def project = new DefaultEclipseProject("name", ":path", null, null, [])
+        def project = new DefaultEclipseProject(projectIdentifier, ":path", null, null, [], "name")
 
         expect:
         project.toString() == "project ':path'"
     }
 
     def emptyDefaultNatureList() {
-        def project = new DefaultEclipseProject("name", ":path", null, null, [])
+        def project = new DefaultEclipseProject(projectIdentifier, ":path", null, null, [], "name")
 
         expect:
         project.projectNatures.isEmpty()
     }
 
     def emptyDefaultBuilderList() {
-        def project = new DefaultEclipseProject("name", ":path", null, null, [])
+        def project = new DefaultEclipseProject(projectIdentifier, ":path", null, null, [], "name")
 
         expect:
         project.buildCommands.isEmpty()
