@@ -46,6 +46,7 @@ import org.gradle.workers.internal.WorkerDaemonFactory;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class DaemonScalaCompiler<T extends ScalaJavaJointCompileSpec> extends AbstractDaemonCompiler<T> {
     private static final Iterable<String> SHARED_PACKAGES =
@@ -68,12 +69,13 @@ public class DaemonScalaCompiler<T extends ScalaJavaJointCompileSpec> extends Ab
         JavaForkOptions javaForkOptions = new BaseForkOptionsConverter(fileResolver).transform(mergeForkOptions(javaOptions, scalaOptions));
         File invocationWorkingDir = javaForkOptions.getWorkingDir();
         javaForkOptions.setWorkingDir(daemonWorkingDir);
+        javaForkOptions.setEnvironment(Collections.emptyMap());
 
         DaemonForkOptions daemonForkOptions = new DaemonForkOptionsBuilder(fileResolver)
             .javaForkOptions(javaForkOptions)
             .classpath(zincClasspath)
             .sharedPackages(SHARED_PACKAGES)
-            .keepAliveMode(KeepAliveMode.SESSION)
+            .keepAliveMode(KeepAliveMode.DAEMON)
             .build();
 
         return new InvocationContext(invocationWorkingDir, daemonForkOptions);
