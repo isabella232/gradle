@@ -57,10 +57,10 @@ class UpToDateScalaCompileIntegrationTest extends AbstractIntegrationSpec {
 
         where:
         newScalaVersion | newZincVersion
-        '2.11.8'       | '0.3.12'
-        '2.11.9'        | '0.3.13'
+        '2.11.8'       | '1.2.4'
+        '2.11.9'        | '1.2.5'
         defaultScalaVersion = '2.11.8'
-        defaultZincVersion = '0.3.13'
+        defaultZincVersion = '1.2.5'
         changedVersion = defaultScalaVersion != newScalaVersion ? 'scala' : 'zinc'
     }
 
@@ -69,7 +69,7 @@ class UpToDateScalaCompileIntegrationTest extends AbstractIntegrationSpec {
         def jdk7 = AvailableJavaHomes.getJdk(VERSION_1_7)
         def jdk8 = AvailableJavaHomes.getJdk(VERSION_1_8)
 
-        buildScript(scalaProjectBuildScript('0.3.13', '2.11.8'))
+        buildScript(scalaProjectBuildScript('1.2.5', '2.11.8'))
         when:
         executer.withJavaHome(jdk7.javaHome)
         run 'compileScala'
@@ -97,7 +97,7 @@ class UpToDateScalaCompileIntegrationTest extends AbstractIntegrationSpec {
             ${jcenterRepository()}
 
             dependencies {
-                zinc "com.typesafe.zinc:zinc:${zincVersion}"
+                zinc "org.scala-sbt:zinc_2.12:${zincVersion}"
                 compile "org.scala-lang:scala-library:${scalaVersion}" 
             }
             

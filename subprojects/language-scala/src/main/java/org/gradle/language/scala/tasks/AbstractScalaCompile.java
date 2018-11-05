@@ -43,6 +43,7 @@ import org.gradle.api.tasks.PathSensitivity;
 import org.gradle.api.tasks.TaskAction;
 import org.gradle.api.tasks.compile.AbstractCompile;
 import org.gradle.api.tasks.compile.CompileOptions;
+import org.gradle.internal.buildevents.BuildStartedTime;
 
 import java.io.File;
 import java.util.Collections;
@@ -104,6 +105,7 @@ public abstract class AbstractScalaCompile extends AbstractCompile {
         spec.setCompileOptions(getOptions());
         spec.setScalaCompileOptions(scalaCompileOptions);
         spec.setAnnotationProcessorPath(ImmutableList.copyOf(getEffectiveAnnotationProcessorPath()));
+        spec.setBuildStartTimestamp(getServices().get(BuildStartedTime.class).getStartTime());
         return spec;
     }
 

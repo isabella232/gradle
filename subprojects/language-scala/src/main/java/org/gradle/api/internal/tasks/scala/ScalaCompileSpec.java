@@ -28,4 +28,6 @@ public interface ScalaCompileSpec extends JvmLanguageCompileSpec {
     Map<File, File> getAnalysisMap();
 
     void setAnalysisMap(Map<File, File> analysisMap);
+
+    long getBuildStartTimestamp();
 }

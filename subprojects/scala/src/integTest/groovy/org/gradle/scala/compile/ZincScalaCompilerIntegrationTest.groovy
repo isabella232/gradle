@@ -20,6 +20,7 @@ import org.gradle.integtests.fixtures.MultiVersionIntegrationSpec
 import org.gradle.integtests.fixtures.ScalaCoverage
 import org.gradle.integtests.fixtures.TargetCoverage
 import org.gradle.integtests.fixtures.TestResources
+import org.gradle.internal.hash.Hashing
 import org.gradle.test.fixtures.file.ClassFile
 import org.gradle.util.Requires
 import org.gradle.util.TestPrecondition
@@ -334,11 +335,8 @@ class Person(val name: String, val age: Int) {
         run("compileScala")
 
         then:
-        person.exists()
-        house.exists()
-        other.exists()
-        person.lastModified() != old(person.lastModified())
-        house.lastModified() != old(house.lastModified())
+        classHash(person) != old(classHash(person))
+        classHash(house) != old(classHash(house))
         other.lastModified() == old(other.lastModified())
     }
 
@@ -368,6 +366,7 @@ class Person(val name: String, val age: Int) {
         def person = file("prj1/build/classes/scala/main/Person.class")
         def house = file("prj2/build/classes/scala/main/House.class")
         def other = file("prj2/build/classes/scala/main/Other.class")
+        args("-PscalaVersion=$version")
         run("compileScala")
 
         when:
@@ -377,9 +376,10 @@ class Person(val name: String, val age: Int) {
         run("compileScala")
 
         then:
-        person.lastModified() != old(person.lastModified())
-        house.lastModified() != old(house.lastModified())
+        classHash(person) != old(classHash(person))
+        classHash(house) != old(classHash(house))
         other.lastModified() == old(other.lastModified())
+
     }
 
     def compilesAllScalaCodeWhenForced() {
@@ -396,8 +396,18 @@ class Person(val name: String, val age: Int) {
         run("compileScala")
 
         then:
-        person.lastModified() != old(person.lastModified())
+        classHash(person) != old(classHash(person))
         house.lastModified() != old(house.lastModified())
         other.lastModified() != old(other.lastModified())
+    }
+
+    def classHash(File file) {
+        def dir = file.parentFile
+        def name = file.name - '.class'
+        def hasher = Hashing.md5().newHasher()
+        dir.listFiles().findAll { it.name.startsWith(name) && it.name.endsWith('.class')}.sort().each {
+            hasher.putBytes(it.bytes)
+        }
+        hasher.hash()
     }
 }

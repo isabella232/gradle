@@ -162,7 +162,7 @@ public class ScalaBasePlugin implements Plugin<Project> {
                     public Configuration call() throws Exception {
                         Configuration config = project.getConfigurations().getAt(ZINC_CONFIGURATION_NAME);
                         if (config.getDependencies().isEmpty()) {
-                            project.getDependencies().add("zinc", "com.typesafe.zinc:zinc:" + DefaultScalaToolProvider.DEFAULT_ZINC_VERSION);
+                            project.getDependencies().add("zinc", "org.scala-sbt:zinc_2.12:" + DefaultScalaToolProvider.DEFAULT_ZINC_VERSION);
                         }
                         return config;
                     }
